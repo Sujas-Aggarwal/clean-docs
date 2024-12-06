@@ -22,3 +22,6 @@ h4{
 .editor-box .rdw-center-aligned-block {
     line-height: 10px;
 }
+.editor-box ::selection{
+    background-color: rgba(85, 0, 255, 0.285);
+}

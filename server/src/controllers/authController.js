@@ -37,13 +37,14 @@ const login = async (req, res) => {
         const accessToken = jwt.sign(
             {"user": {
                 "username": searchUser[0].username,
-                "roles": roles
+                "roles": roles,
+                "uid": searchUser[0].id
             }},
             process.env.ACCESSTOKEN_SECRET,
             { expiresIn: '1d' }
         );
         const refreshToken = jwt.sign(
-            { "username": searchUser[0].username },
+            { "username": searchUser[0].username,"uid":searchUser[0].id },
             process.env.REFRESHTOKEN_SECRET,
             { expiresIn: '10d' }
         );

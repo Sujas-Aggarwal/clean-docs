@@ -7,11 +7,12 @@ import { Error } from "./pages/Error/index";
 import { Register } from "./pages/LoginSystem/register";
 import { Login } from "./pages/LoginSystem/login";
 import TextEditor from "./pages/Editor";
+import MyDocs from "./pages/MyDocs";
 
 function App() {
   return (
     <Router>
-            {/* <Navbar /> */}
+      {/* <Navbar /> */}
       <Routes>
         <Route element={<PersistLogin />}>
           <Route path="/" element={<Home />} />
@@ -24,8 +25,8 @@ function App() {
 
           {/* Routes requiring the user to be logged in */}
           <Route element={<RequireAuth allowedRoles={["user"]} />}>
-            <Route path="/private" element={<h1>Private page</h1>} />
-            <Route path="/editor" element={<TextEditor />} />
+            <Route path="/docs" element={<MyDocs />} />
+            <Route path="/docs/:id" element={<TextEditor />} />
           </Route>
 
           {/* Routes requiring the user to be an admin */}
