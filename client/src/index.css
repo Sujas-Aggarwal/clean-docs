@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+h1{
+    /* @apply text-[24px]; */
+    font-size: 24px;
+}
+h2{
+    /* @apply text-[20px]; */
+    font-size: 20px;
+}
+h3{
+    /* @apply text-[18px]; */
+    font-size: 18px;
+}
+h4{
+    /* @apply text-[16px]; */
+    font-size: 16px;
+}
+
+.editor-box .rdw-center-aligned-block {
+    line-height: 10px;
+}
