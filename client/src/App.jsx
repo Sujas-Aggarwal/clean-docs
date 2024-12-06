@@ -7,6 +7,7 @@ import { Home } from "./pages/Home/index";
 import { Error } from "./pages/Error/index";
 import { Register } from "./pages/LoginSystem/register";
 import { Login } from "./pages/LoginSystem/login";
+import Editor from "./pages/Editor";
 
 function App() {
     return (
@@ -26,6 +27,7 @@ function App() {
                     {/* Routes requiring the user to be logged in */}
                     <Route element={<RequireAuth allowedRoles={['user']} />}>
                         <Route path="/private" element={<h1>Private page</h1>} />
+                        <Route path="/editor" element={<Editor/>} />
                     </Route>
                     
                     {/* Routes requiring the user to be an admin */}

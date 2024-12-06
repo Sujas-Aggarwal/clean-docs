@@ -9,10 +9,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const userRegex = /^[A-z][A-z0-9-_]{3,18}$/;
 const emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!*@#$%]).{8,24}$/;
+const passwordRegex = /^[A-Za-z0-9@]{8,24}$/;
 
 export const Register = () => {
-    setTitle();
+    setTitle("Register");
 
     const usernameRef = useRef();
     const errRef = useRef();
@@ -135,7 +135,6 @@ export const Register = () => {
                                 />
                                 <p id="pwdnote" className={passwordFocus && !validEmail ? styles.instructions : "hide"}>
                                     8 to 24 characters.
-                                    <br/>Must include uppercase, lowercase letters, a number and a special character (! * @ # $ %).
                                 </p>
                             </div>
 
