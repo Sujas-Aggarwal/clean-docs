@@ -8,7 +8,7 @@ const verifyJWT = (req, res, next) => {
 
     // const token = authHeader.split(' ')[1];
     const token = req.cookies.jwt;
-    console.log("token",token)
+    // console.log("token",token)
     jwt.verify(
         token,
         process.env.REFRESHTOKEN_SECRET,
@@ -17,7 +17,7 @@ const verifyJWT = (req, res, next) => {
             req.username = decoded.username;
             req.roles = decoded.roles;
             req.uid = decoded.uid;
-            console.log("decoded",decoded)
+            // console.log("decoded",decoded)
             next();
         }
     );

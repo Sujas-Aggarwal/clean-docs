@@ -23,7 +23,10 @@ function MyDocs() {
     await axios
       .put(
         "/documents",
-        { isStarterDocument: type == "starter" ? true : false },
+        {
+          isStarterDocument: type == "starter" ? true : false,
+          isNewDocument: true,
+        },
         { withCredentials: true }
       )
       .then((document) => {
@@ -62,7 +65,7 @@ function MyDocs() {
         </div>
         <div className="border-b  flex flex-cl gap-4 flex-col pb-10">
           <h1>Saved Documents</h1>
-          <div className="flex gap-4">
+          <div className="flex gap-4 max-w-screen flex-wrap">
             {docs.map((doc, index) => {
               return (
                 <Link to={`/docs/${doc.id}`} key={index}>

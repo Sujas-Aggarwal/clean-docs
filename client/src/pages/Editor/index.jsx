@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -11,24 +11,15 @@ import "react-toastify/dist/ReactToastify.css";
 const TextEditor = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
-  const [blocks, setBlocks] = useState([]);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const editorStateRef = useRef(editorState);
 
-  // Keyboard shortcut and auto-save effect
+  // Update ref whenever editorState changes
   useEffect(() => {
-    const saveDocOnKeyPress = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        saveDocument();
-      }
-    };
-
-    document.addEventListener("keydown", saveDocOnKeyPress);
-    return () => document.removeEventListener("keydown", saveDocOnKeyPress);
-  }, []);
-
+    editorStateRef.current = editorState;
+  }, [editorState]);
 
   // Document fetching effect
   useEffect(() => {
@@ -37,16 +28,28 @@ const TextEditor = () => {
         const response = await axios.get(`/documents/${id}`, {
           withCredentials: true,
         });
-
         const currentVersion = response.data.current_version || [];
-        setBlocks(currentVersion);
 
         // Convert fetched blocks to EditorState
         const contentState = convertFromRaw({
           entityMap: {},
-          blocks: currentVersion,
+          blocks:
+            currentVersion.length > 0
+              ? currentVersion
+              : [
+                  {
+                    text: "",
+                    type: "unstyled",
+                    depth: 0,
+                    inlineStyleRanges: [],
+                    entityRanges: [],
+                    data: {},
+                  },
+                ],
         });
-        setEditorState(EditorState.createWithContent(contentState));
+        const newEditorState = EditorState.createWithContent(contentState);
+        setEditorState(newEditorState);
+        editorStateRef.current = newEditorState;
 
         setIsLoading(false);
       } catch (error) {
@@ -63,17 +66,53 @@ const TextEditor = () => {
     }
   }, [id]);
 
-  const saveDocument = async () => {
+  // Keyboard shortcut and save effect
+  useEffect(() => {
+    const saveDocOnKeyPress = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        // Use the ref to get the most current editor state
+        e.preventDefault();
+        const currentEditorState = editorStateRef.current;
+        saveDocument(currentEditorState);
+      }
+    };
+
+    document.addEventListener("keydown", saveDocOnKeyPress);
+    return () => document.removeEventListener("keydown", saveDocOnKeyPress);
+  }, []);
+
+  const saveDocument = async (currentState = editorState) => {
     try {
+      // Derive blocks from the current editorState
+      const rawContent = convertToRaw(currentState.getCurrentContent());
+      const currentBlocks = rawContent.blocks;
+
+      // Ensure we don't send empty blocks if there were previous blocks
+      const blocksToSave =
+        currentBlocks.length > 0
+          ? currentBlocks
+          : [
+              {
+                text: "",
+                type: "unstyled",
+                depth: 0,
+                inlineStyleRanges: [],
+                entityRanges: [],
+                data: {},
+              },
+            ];
+
       const response = await axios.put(
         "/documents",
         {
-          blocks,
+          blocks: blocksToSave,
           isNewDocument: false,
           documentId: id,
+          isStarterDocument: false,
         },
         { withCredentials: true }
       );
+
       toast.success("Document saved successfully!");
       console.log("Document Saved Successfully:", response.data);
     } catch (error) {
@@ -83,8 +122,6 @@ const TextEditor = () => {
   };
 
   const onEditorStateChange = (newEditorState) => {
-    const rawContent = convertToRaw(newEditorState.getCurrentContent());
-    setBlocks(rawContent.blocks);
     setEditorState(newEditorState);
   };
 
@@ -94,7 +131,7 @@ const TextEditor = () => {
 
   return (
     <div>
-      <ToastContainer 
+      <ToastContainer
         position="bottom-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -103,7 +140,7 @@ const TextEditor = () => {
       />
       <EditorHeader />
       <button
-        onClick={saveDocument}
+        onClick={() => saveDocument()}
         className="fixed top-0 right-0 z-[1001] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Save

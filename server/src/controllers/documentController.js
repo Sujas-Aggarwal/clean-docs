@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+const starterBlocks = require("../data/templates/starter");
 
 // Fetch all documents for a specific user
 async function getDocuments(uid) {
@@ -7,6 +8,12 @@ async function getDocuments(uid) {
       "SELECT * FROM documents WHERE owner_uid = ?",
       [uid]
     );
+    //sort documents based on updated_at
+    documents.sort((a, b) => {
+      if (a.updated_at < b.updated_at) return 1;
+      if (a.updated_at > b.updated_at) return -1;
+      return 0;
+    });
     return documents;
   } catch (err) {
     console.error("Error getting documents:", err);
@@ -18,150 +25,14 @@ async function getDocuments(uid) {
 async function saveDocument(
   uid,
   blocks = [],
-  isNewDocument = true,
+  isNewDocument = false,
   documentId = null,
   isStarterDocument = false
 ) {
   try {
-    if (isNewDocument) {
+    if (isNewDocument && blocks.length === 0) {
       if (isStarterDocument) {
-        blocks = [
-          {
-            key: "5v7hq",
-            text: "Clean Docs",
-            type: "header-one",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "ljsl",
-            text: "It's amazing because it provides so many features - ",
-            type: "unstyled",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "f2k5p",
-            text: "live collaboration",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "9ricm",
-            text: "multiple pages",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "9kclg",
-            text: "responsive",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "faqsh",
-            text: "optimised",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "9bftr",
-            text: "rich text",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "dao93",
-            text: "markdown support",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "attdp",
-            text: "back support with ms word and google docs",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "82pnt",
-            text: "authentication",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "cak77",
-            text: "styled using tailwind",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "24vi8",
-            text: "made using react, nodejs and mariadb",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "9ro5g",
-            text: "live websockets using socket io ",
-            type: "unordered-list-item",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "eqhtm",
-            text: "",
-            type: "unstyled",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-          {
-            key: "cs7ub",
-            text: "[PS: The above text was copy pasted from my notion]",
-            type: "unstyled",
-            depth: 0,
-            inlineStyleRanges: [],
-            entityRanges: [],
-            data: {},
-          },
-        ];
+        blocks = starterBlocks;
       }
       const newDocId = uuidv4();
       await global.db.query(
@@ -175,6 +46,7 @@ async function saveDocument(
       console.log("Document created successfully:", newDocId);
       return newDocId;
     } else {
+      console.log("Request to update");
       await global.db.query(
         "UPDATE documents SET current_version = ? WHERE id = ?",
         [JSON.stringify(blocks), documentId]
