@@ -31,7 +31,7 @@ const PersistLogin = () => {
             { !persist
                 ? <Outlet />
                 : isLoading
-                    ? <h2 className="container">Loading...</h2>
+                    ? <h2 className="flex w-full h-screen fixed top-0 left-0 justify-center items-center bg-white"><img src="/loading.svg" width={30} height={30} alt="Loading" /></h2>
                     : <Outlet />
             }
         </>

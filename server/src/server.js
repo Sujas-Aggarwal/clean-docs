@@ -11,18 +11,20 @@ const app = express();
 app.use(cors({
     origin: process.env.ALLOWED_ORIGIN,
     credentials: true,
-    optionsSuccessStatus: 200
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
+app.get("/",verifyJWT, (req, res) => {
+    res.json(req.username);
+}); 
 app.use('/user', require('./routes/user'));
 
 // Private routes
 app.use(verifyJWT);
 app.use('/users', require('./routes/users'));
+app.use('/documents', require('./routes/documents'));
 
 app.get('*', (req, res) => { res.status(404).json({'message': "Not found"}) })
 
