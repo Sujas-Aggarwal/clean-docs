@@ -46,6 +46,7 @@ router.put("/", async (req, res) => {
   try {
     const documentId = await saveDocument(
       req.uid,
+      req.body.name?req.body.name:"Untitled",
       req.body.blocks,
       req.body.isNewDocument,
       req.body.documentId,

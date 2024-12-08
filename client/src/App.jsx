@@ -27,7 +27,7 @@ function App() {
           {/* Routes requiring the user to be logged in */}
           <Route element={<RequireAuth allowedRoles={["user"]} />}>
             <Route path="/docs" element={<MyDocs />} />
-            <Route path="/docs/:id" element={< MarkdownEditor/>} />
+            <Route path="/docs/:id" element={< TextEditor/>} />
           </Route>
 
           {/* Routes requiring the user to be an admin */}

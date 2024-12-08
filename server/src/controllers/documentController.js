@@ -20,10 +20,10 @@ async function getDocuments(uid) {
     throw err;
   }
 }
-
 // Save a new document or update an existing one
 async function saveDocument(
   uid,
+  name = "Untitled",
   blocks = [],
   isNewDocument = false,
   documentId = null,
@@ -37,7 +37,7 @@ async function saveDocument(
       const newDocId = uuidv4();
       await global.db.query(
         "INSERT INTO documents (id, owner_uid, current_version) VALUES (?, ?, ?)",
-        [newDocId, uid, JSON.stringify(blocks)]
+        [newDocId, uid, JSON.stringify(blocks), name]
       );
       await global.db.query(
         "INSERT INTO document_versions (document_id, version_number, content) VALUES (?, ?, ?)",
@@ -47,19 +47,27 @@ async function saveDocument(
       return newDocId;
     } else {
       console.log("Request to update");
-      await global.db.query(
-        "UPDATE documents SET current_version = ? WHERE id = ?",
-        [JSON.stringify(blocks), documentId]
-      );
-      console.log("Document updated successfully:", documentId);
-      return documentId;
+      if (name === "Untitled") {
+        await global.db.query(
+          "UPDATE documents SET current_version = ? WHERE id = ?",
+          [JSON.stringify(blocks), documentId]
+        );
+        console.log("Document updated successfully:", documentId);
+        return documentId;
+      } else {
+        await global.db.query(
+          "UPDATE documents SET  name = ? WHERE id = ?",
+          [ name, documentId]
+        );
+        console.log("Document name changed successfully", documentId);
+        return documentId;
+      }
     }
   } catch (err) {
     console.error("Error saving document:", err);
     throw err;
   }
 }
-
 // Fetch a specific document by ID
 async function getDocument(documentId) {
   try {

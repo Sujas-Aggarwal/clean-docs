@@ -70,7 +70,7 @@ function MyDocs() {
               return (
                 <Link to={`/docs/${doc.id}`} key={index}>
                   <div className="w-[120px] h-[150px] rounded-md bg-white shadow-xl shadow-black/20 flex justify-center items-center text-center text-xs cursor-pointer hover:scale-105 transition-all duration-200">
-                    {doc.id}
+                    {doc.name}
                   </div>
                 </Link>
               );

@@ -8,15 +8,15 @@ import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const TextEditor = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
   const editorStateRef = useRef(editorState);
-
+  const [docName, setDocName] = useState("Untitled");
   // Update ref whenever editorState changes
   useEffect(() => {
     editorStateRef.current = editorState;
@@ -30,7 +30,7 @@ const TextEditor = () => {
           withCredentials: true,
         });
         const currentVersion = response.data.current_version || [];
-
+        setDocName(response.data.name);
         // Convert fetched blocks to EditorState
         const contentState = convertFromRaw({
           entityMap: {},
@@ -73,8 +73,7 @@ const TextEditor = () => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         // Use the ref to get the most current editor state
         e.preventDefault();
-        const currentEditorState = editorStateRef.current;
-        saveDocument(currentEditorState);
+        saveDocument();
       }
     };
 
@@ -82,9 +81,11 @@ const TextEditor = () => {
     return () => document.removeEventListener("keydown", saveDocOnKeyPress);
   }, []);
 
-  const saveDocument = async (currentState = editorState) => {
+  const saveDocument = async () => {
+    setIsSaving(true);
     try {
       // Derive blocks from the current editorState
+      let currentState = editorStateRef.current;
       const rawContent = convertToRaw(currentState.getCurrentContent());
       const currentBlocks = rawContent.blocks;
 
@@ -114,43 +115,77 @@ const TextEditor = () => {
         { withCredentials: true }
       );
 
-      toast.success("Document saved successfully!");
       console.log("Document Saved Successfully:", response.data);
     } catch (error) {
       console.error("Error saving document:", error);
       toast.error("Failed to save document");
     }
+    finally{
+      setIsSaving(false);
+    }
+
   };
+  const saveTimeoutRef = useRef(null);
 
   const onEditorStateChange = (newEditorState) => {
     setEditorState(newEditorState);
+
+    // Reset the timer if it's already running
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Start a new timeout
+    saveTimeoutRef.current = setTimeout(() => {
+      saveDocument(newEditorState);
+      saveTimeoutRef.current = null; // Clear the timeout after saving
+    }, 500);
   };
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+  async function setDocumentName(name){
+    try {
+      await axios.put(
+        "/documents",
+        {
+          name: name,
+          isNewDocument: false,
+          documentId: id,
+          isStarterDocument: false,
+        },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Error saving document:", error);
+      toast.error("Failed to save document");
+    }
   }
 
   return (
     <div>
       <ToastContainer
         position="bottom-right"
+        className={"print:hidden"}
         autoClose={3000}
         hideProgressBar={false}
         closeOnClick
         pauseOnHover
       />
-      <EditorHeader />
-      <button
-        onClick={() => saveDocument()}
-        className="fixed top-0 right-0 z-[1001] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Save
-      </button>
-      <div className="bg-[#F8F9FA] min-h-screen pb-16 editor-dabba">
-        <div className="h-[120px]"></div>
+      <EditorHeader isSaving={isSaving} saveFunction={saveDocument} documentName={docName} setDocumentName={setDocumentName}/>
+      <div className="bg-[#F8F9FA] min-h-screen pb-16 print:p-0 print:m-0 editor-dabba">
+        <div className="h-[120px] print:hidden"></div>
         <Editor
-          toolbarClassName="flex fixed top-[80px] left-0 w-full z-[1000] mx-auto"
-          editorClassName="editor-box mt-6 bg-white shadow-lg w-[816px] min-h-[1054px] mx-auto mb-12 border p-10 print:p-0 print:w-full print:min-w-0"
+          toolbarClassName="flex fixed top-[80px] left-0 w-full z-[1000] mx-auto print:hidden"
+          editorClassName="editor-box print:shadow-none print:border-none mt-6 bg-white shadow-lg w-[816px] min-h-[1054px] mx-auto mb-12 border p-10 print:p-0 print:w-full print:min-w-0 print:m-0"
           editorState={editorState}
           placeholder="Start writing here..."
           onEditorStateChange={onEditorStateChange}
@@ -164,8 +199,6 @@ const TextEditor = () => {
               "textAlign",
               "colorPicker",
               "link",
-              "embedded",
-              "emoji",
               "image",
               "remove",
               "history",

@@ -23,5 +23,17 @@ h4{
     line-height: 10px;
 }
 .editor-box ::selection{
-    background-color: rgba(85, 0, 255, 0.285);
+    @apply bg-blue-200
+}
+.rdw-option-wrapper{
+    @apply border-none outline-none py-2 rounded-sm;
+}
+.rdw-option-wrapper:hover{
+    @apply bg-blue-50  shadow-none border-none  outline-none
+}
+.rdw-option-wrapper:active{
+    @apply bg-blue-200  shadow-none border-none transition-all duration-100
+}
+.rdw-option-active{
+    @apply bg-blue-100  shadow-none border-none
 }

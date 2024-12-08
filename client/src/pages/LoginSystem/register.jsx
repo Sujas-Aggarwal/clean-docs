@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const userRegex = /^[A-z][A-z0-9-_]{3,18}$/;
 const emailRegex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-const passwordRegex = /^[A-Za-z0-9@]{8,24}$/;
+const passwordRegex = /^[A-Za-z0-9@]{4,24}$/;
 
 export const Register = () => {
     setTitle("Register");
@@ -103,10 +103,7 @@ export const Register = () => {
                                     aria-invalid={validUsername ? "false" :"true"} aria-describedby="uidnote"
                                     style={{borderBottomColor: validUsername ? "var(--green)" : (username && "var(--red)")}}
                                 />
-                                <p id="uidnote" className={usernameFocus && username && !validUsername ? styles.instructions : "hide"}>
-                                    4 to 24 characters (must begin with a letter).
-                                    <br/>Letters, numbers, underscores or hyphens.
-                                </p>
+                       
                             </div>
 
                             <div className={styles.input_field}>
@@ -119,9 +116,7 @@ export const Register = () => {
                                     style={{borderBottomColor: validEmail ? "var(--green)" : (email && "var(--red)")}}
                                 />
 
-                                <p id="emailnote" className={emailFocus && email && !validEmail ? styles.instructions : "hide"}>
-                                    Must be a valid email.
-                                </p>
+                      
                             </div>
 
                             <div className={styles.input_field}>
@@ -133,9 +128,7 @@ export const Register = () => {
                                     aria-invalid={validEmail ? "false" :"true"} aria-describedby="pwdnote"
                                     style={{borderBottomColor: validPassword ? "var(--green)" : (password && "var(--red)")}}
                                 />
-                                <p id="pwdnote" className={passwordFocus && !validEmail ? styles.instructions : "hide"}>
-                                    8 to 24 characters.
-                                </p>
+
                             </div>
 
                             <div className={styles.input_field}>
@@ -149,9 +142,7 @@ export const Register = () => {
                                     onBlur={() => setMatchFocus(false)}
                                     style={{borderBottomColor: validMatch && matchPassword ? "var(--green)" : (matchPassword && "var(--red)")}}
                                 />
-                                <p id="confirmnote" className={matchFocus && !validMatch ? styles.instructions : "hide"}>
-                                    Must match the first password input field.
-                                </p>
+                      
                             </div>
 
                             <button
