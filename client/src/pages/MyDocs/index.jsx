@@ -56,6 +56,7 @@ function MyDocs() {
   return (
     <div>
       <Navbar />
+      <div className="fixed bg-white top-0 left-0 h-[65px] w-full z-10"></div>
       <div className="h-[80px]"></div>
       <div className="px-8">
         <div className="border-b flex flex-cl gap-4 flex-col pb-10">
