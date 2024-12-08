@@ -9,10 +9,19 @@ import { Login } from "./pages/LoginSystem/login";
 import TextEditor from "./pages/Editor";
 import MyDocs from "./pages/MyDocs";
 import MarkdownEditor from "./pages/Editor/markdown";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <Router>
+      <ToastContainer
+        position="bottom-right"
+        className={"print:hidden"}
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+      />
       {/* <Navbar /> */}
       <Routes>
         <Route element={<PersistLogin />}>
@@ -27,7 +36,7 @@ function App() {
           {/* Routes requiring the user to be logged in */}
           <Route element={<RequireAuth allowedRoles={["user"]} />}>
             <Route path="/docs" element={<MyDocs />} />
-            <Route path="/docs/:id" element={< TextEditor/>} />
+            <Route path="/docs/:id" element={<TextEditor />} />
           </Route>
 
           {/* Routes requiring the user to be an admin */}

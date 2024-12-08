@@ -6,6 +6,7 @@ const {
   getDocument,
   getDocumentVersions,
   saveDocumentVersion,
+  deleteDocument
 } = require("../controllers/documentController");
 
 // Get all documents for a user
@@ -67,6 +68,16 @@ router.get("/:id/versions", async (req, res) => {
   } catch (err) {
     console.error("Error in GET /documents/:id/versions:", err);
     res.status(500).json({ error: "Failed to fetch document versions." });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    await deleteDocument(req.params.id);
+    res.json({ message: "Document deleted successfully!" });
+  } catch (err) {
+    console.error("Error in DELETE /documents/:id:", err);
+    res.status(500).json({ error: "Failed to delete document." });
   }
 });
 

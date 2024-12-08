@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -7,6 +7,7 @@ import axios from "../../lib/axios";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 
 const TextEditor = () => {
   const { id } = useParams();
@@ -172,14 +173,7 @@ const TextEditor = () => {
 
   return (
     <div>
-      <ToastContainer
-        position="bottom-right"
-        className={"print:hidden"}
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-      />
+
       <EditorHeader isSaving={isSaving} saveFunction={saveDocument} documentName={docName} setDocumentName={setDocumentName}/>
       <div className="bg-[#F8F9FA] min-h-screen pb-16 print:p-0 print:m-0 editor-dabba">
         <div className="h-[120px] print:hidden"></div>
@@ -199,7 +193,6 @@ const TextEditor = () => {
               "textAlign",
               "colorPicker",
               "link",
-              "image",
               "remove",
               "history",
             ],

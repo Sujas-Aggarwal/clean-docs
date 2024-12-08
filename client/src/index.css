@@ -2,38 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-h1{
-    /* @apply text-[24px]; */
-    font-size: 24px;
+h1 {
+  /* @apply text-[24px]; */
+  font-size: 24px;
 }
-h2{
-    /* @apply text-[20px]; */
-    font-size: 20px;
+h2 {
+  /* @apply text-[20px]; */
+  font-size: 20px;
 }
-h3{
-    /* @apply text-[18px]; */
-    font-size: 18px;
+h3 {
+  /* @apply text-[18px]; */
+  font-size: 18px;
 }
-h4{
-    /* @apply text-[16px]; */
-    font-size: 16px;
+h4 {
+  /* @apply text-[16px]; */
+  font-size: 16px;
 }
 
 .editor-box .rdw-center-aligned-block {
-    line-height: 10px;
+  line-height: 10px;
 }
-.editor-box ::selection{
-    @apply bg-blue-200
+.editor-box ::selection {
+  @apply bg-blue-200;
 }
-.rdw-option-wrapper{
-    @apply border-none outline-none py-2 rounded-sm;
+.rdw-option-wrapper {
+  @apply border-none outline-none py-2 rounded-sm;
 }
-.rdw-option-wrapper:hover{
-    @apply bg-blue-50  shadow-none border-none  outline-none
+.rdw-option-wrapper:hover {
+  @apply bg-blue-50  shadow-none border-none  outline-none;
 }
-.rdw-option-wrapper:active{
-    @apply bg-blue-200  shadow-none border-none transition-all duration-100
+.rdw-option-wrapper:active {
+  @apply bg-blue-200  shadow-none border-none transition-all duration-100;
 }
-.rdw-option-active{
-    @apply bg-blue-100  shadow-none border-none
+.rdw-option-active {
+  @apply bg-blue-100  shadow-none border-none;
+}
+
+.home-bg {
+  background: radial-gradient(
+      circle closest-corner at 50% 0%,
+      rgba(6 3 25 / 1) 105%,
+      rgba(114 38 170 / 1) 130%,
+      transparent 200%
+    ),
+    radial-gradient(
+      circle closest-corner at 50% 100%,
+      rgba(6 3 25 / 1) 105%,
+      rgba(114 38 170 / 1) 130%,
+      transparent 200%
+    );
 }

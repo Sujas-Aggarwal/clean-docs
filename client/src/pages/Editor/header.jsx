@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function EditorHeader({
   documentName = "Untitled",
@@ -10,13 +11,15 @@ export default function EditorHeader({
   return (
     <div className="flex print:hidden z-[1000] flex-col h-[90px] justify-center items-center bg-white w-full fixed top-0 left-0">
       <div className="h-[35px] w-full flex px-4 items-center gap-1 bg-white ">
-        <img
-          width={30}
-          height={30}
-          className="mb-[-6px]"
-          src="https://images.freeimages.com/fic/images/icons/2813/flat_jewels/512/file.png"
-          alt=""
-        />
+        <Link to={"./.."}>
+          <img
+            width={30}
+            height={30}
+            className="mb-[-6px]"
+            src="https://images.freeimages.com/fic/images/icons/2813/flat_jewels/512/file.png"
+            alt=""
+          />
+        </Link>
         <input
           min={1}
           max={20}
@@ -37,7 +40,7 @@ export default function EditorHeader({
           </div>
         ) : (
           <div className="flex ml-auto gap-1 justify-center items-center">
-            <img src="/cloud.svg" alt=""  className="w-[20px]"/>
+            <img src="/cloud.svg" alt="" className="w-[20px]" />
             <p className="text-sm px-1 pr-2 ">All changes saved</p>
           </div>
         )}

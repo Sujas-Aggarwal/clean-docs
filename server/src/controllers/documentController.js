@@ -10,8 +10,8 @@ async function getDocuments(uid) {
     );
     //sort documents based on updated_at
     documents.sort((a, b) => {
-      if (a.updated_at < b.updated_at) return 1;
-      if (a.updated_at > b.updated_at) return -1;
+      if (a.created_at < b.created_at) return 1;
+      if (a.created_at > b.created_at) return -1;
       return 0;
     });
     return documents;
@@ -122,19 +122,31 @@ async function saveDocumentVersion(documentId, blocks) {
 
 // Delete a document and its versions
 async function deleteDocument(documentId) {
+  const db = global.db; // Use global db instance
+
   try {
-    await global.db.query("DELETE FROM documents WHERE id = ?", [documentId]);
-    console.log("Document deleted successfully:", documentId);
-    await global.db.query(
-      "DELETE FROM document_versions WHERE document_id = ?",
-      [documentId]
-    );
-    console.log("Document versions deleted successfully:", documentId);
+    // Start a transaction to ensure both deletions succeed or fail together
+    await db.query("START TRANSACTION");
+
+    // Delete associated document versions
+    const versionsResult = await db.query("DELETE FROM document_versions WHERE document_id = ?", [documentId]);
+    console.log(`Document versions deleted successfully for document ID ${documentId}:`, versionsResult.affectedRows);
+
+    // Delete the main document
+    const documentResult = await db.query("DELETE FROM documents WHERE id = ?", [documentId]);
+    console.log(`Document deleted successfully for document ID ${documentId}:`, documentResult.affectedRows);
+
+    // Commit the transaction
+    await db.query("COMMIT");
   } catch (err) {
+    // Rollback the transaction in case of an error
+    await db.query("ROLLBACK");
     console.error("Error deleting document:", err);
     throw err;
   }
 }
+
+
 
 module.exports = {
   getDocuments,
