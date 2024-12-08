@@ -31,8 +31,8 @@ export const Navbar = () => {
   };
 
   return (
-    <header className=" fixed top-0 left-0 text-gray-500   w-full z-50 ">
-      <div className="container mx-auto flex items-center justify-between px-4 py-3">
+    <header className=" fixed font-[Poppins] top-0 left-0 text-gray-500   w-full z-50 ">
+      <div className="container mx-auto h-[60px] flex items-center justify-between px-4 py-3">
         {/* Hamburger Icon for Mobile */}
         <div className="flex items-center space-x-3">
           <div
@@ -45,7 +45,6 @@ export const Navbar = () => {
           </div>
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/favicon.png" alt="Clean Docs" className="w-10 h-10" />
             <span className="text-xl font-semibold hidden sm:block">
               Clean Docs
             </span>
@@ -75,14 +74,12 @@ export const Navbar = () => {
           {auth?.username ? (
             <button
               onClick={logout}
-              className="bg-purple-600 hover:bg-purple-700 text-white py-1 px-4 rounded-lg transition duration-300"
             >
               Log out
             </button>
           ) : (
             <Link
               to="/login"
-              className="bg-purple-600 hover:bg-purple-700 text-white py-1 px-4 rounded-lg transition duration-300"
             >
               Log in
             </Link>

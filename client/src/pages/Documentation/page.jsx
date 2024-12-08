@@ -5,6 +5,7 @@ export default Documentation;
 import { convertFromRaw, EditorState } from "draft-js";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Navbar } from "../../components/Navbar";
 
 function Documentation() {
   const [editorState, setEditorState] = useState(() =>
@@ -669,6 +670,9 @@ function Documentation() {
 
   return (
     <div className="w-[80%] mx-auto">
+      <Navbar/>
+      <div className="h-[60px] fixed bg-white top-0 left-0 z-10 w-full"></div>
+      <div className="h-[60px]"></div>
       <Editor toolbarClassName="hidden" editorState={editorState} onEditorStateChange={setEditorState} />
       <p className="pb-8 italic font-bold  text-right">~ Created using <Link className="text-indigo-600" to="/">Clean Docs</Link></p>
     </div>
