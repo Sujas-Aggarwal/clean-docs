@@ -15,7 +15,7 @@ function App() {
   return (
     <Router>
       <ToastContainer
-        position="bottom-right"
+        position="bottom-left"
         className={"print:hidden"}
         autoClose={3000}
         hideProgressBar={false}

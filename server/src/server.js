@@ -8,6 +8,7 @@ const verifyJWT = require('./middlewares/verifyJWT');
 console.log("\x1b[36m%s\x1b[0m", `Starting the server side...\n`);
 
 const app = express();
+const expressWs = require('express-ws')(app);
 app.use(cors({
     origin: process.env.ALLOWED_ORIGIN,
     credentials: true,
@@ -19,9 +20,15 @@ app.use(cookieParser());
 app.get("/",verifyJWT, (req, res) => {
     res.json(req.username);
 }); 
+app.ws('/', (ws, req) => {
+    ws.on('message', (msg) => {
+        console.log(msg);
+    });
+    ws.send('Hello! Message from server!!');
+});
 app.use('/user', require('./routes/user'));
-
 // Private routes
+app.use("/socket", require('./routes/sockets/router'));
 app.use(verifyJWT);
 app.use('/users', require('./routes/users'));
 app.use('/documents', require('./routes/documents'));

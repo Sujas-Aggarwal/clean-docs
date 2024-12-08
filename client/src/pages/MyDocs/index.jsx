@@ -1,11 +1,28 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 import { Navbar } from "../../components/Navbar";
-import {toast} from 'react-toastify';
+import { toast } from "react-toastify";
 
 import { Link, useNavigate } from "react-router-dom";
 
 function MyDocs() {
+  const templates = [
+    {
+      name: "New Document",
+      img: "https://ssl.gstatic.com/docs/templates/thumbnails/docs-blank-googlecolors.png",
+      template: "new",
+    },
+    {
+      name: "Starter Sheet",
+      img: "https://ssl.gstatic.com/docs/templates/thumbnails/1wyFqxsRmKm9q--7j4WRmBMn694YdhV6hmNrfh4rVm2E_400.png",
+      template: "starter",
+    },
+    {
+      name: "Letter Template",
+      img: "https://ssl.gstatic.com/docs/templates/thumbnails/10e8_E36oj6_LuCRzckBFX_9oqbCHntmYB-jxB5U9gsw_400_2.png",
+      template: "letter",
+    }
+  ];
   const [docs, setDocs] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
@@ -25,7 +42,7 @@ function MyDocs() {
       .put(
         "/documents",
         {
-          isStarterDocument: type == "starter" ? true : false,
+          templateName: type,
           isNewDocument: true,
         },
         { withCredentials: true }
@@ -41,27 +58,29 @@ function MyDocs() {
       <Navbar />
       <div className="h-[80px]"></div>
       <div className="px-4">
-        <div className="border-b flex flex-cl gap-4 flex-col">
-          <h1>Create Document</h1>
+        <div className="border-b flex flex-cl gap-4 flex-col pb-10">
+          <h1>Templates</h1>
           <div className="flex gap-4">
-            <div
-              onClick={() => {
-                CreateDocument("new");
-              }}
-              title="Create New Document"
-              className="w-[100px] h-[100px] mb-10 rounded-md bg-slate-600 flex justify-center items-center text-[90px] text-center text-white hover:scale-105 transition-all duration-150 shadow-xl shadow-black/20 cursor-pointer"
-            >
-              <span className="mt-[-15px]">+</span>
-            </div>
-            <div
-              onClick={() => {
-                CreateDocument("starter");
-              }}
-              title="Create New Document"
-              className="w-[100px] h-[100px] mb-10 rounded-md bg-white text-black flex justify-center items-center text-xs text-center  hover:scale-105 transition-all duration-150 shadow-xl shadow-black/20 cursor-pointer"
-            >
-              <span>Starter Sheet</span>
-            </div>
+            {templates.map((template, index) => {
+              return (
+                <div className="flex flex-col gap-2">
+                  <div
+                    key={index}
+                    onClick={() => {
+                      CreateDocument(template.template);
+                    }}
+                    title={template.name}
+                    className="w-[150px] h-[200px] overflow-hidden outline
+                    outline-gray-100 flex justify-center items-center
+                    text-center hover:outline-blue-100 transition-all
+                    duration-150 cursor-pointer"
+                  >
+                    <img src={template.img} alt="" />
+                  </div>
+                  <p className="font-thin">{template.name}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
         <div className="border-t-[4px] pt-4 flex flex-cl gap-4 flex-col pb-10">

@@ -5,7 +5,7 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import EditorHeader from "./header";
 import axios from "../../lib/axios";
 import { useParams } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
@@ -21,6 +21,7 @@ const TextEditor = () => {
   // Update ref whenever editorState changes
   useEffect(() => {
     editorStateRef.current = editorState;
+    //auto focus on editor
   }, [editorState]);
 
   // Document fetching effect
@@ -89,6 +90,7 @@ const TextEditor = () => {
       let currentState = editorStateRef.current;
       const rawContent = convertToRaw(currentState.getCurrentContent());
       const currentBlocks = rawContent.blocks;
+      console.log(currentBlocks)
 
       // Ensure we don't send empty blocks if there were previous blocks
       const blocksToSave =

@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const starterBlocks = require("../data/templates/starter");
+const templates = require("../data/templates/starter");
 
 // Fetch all documents for a specific user
 async function getDocuments(uid) {
@@ -27,16 +27,22 @@ async function saveDocument(
   blocks = [],
   isNewDocument = false,
   documentId = null,
-  isStarterDocument = false
+  templateName = null
 ) {
+  if (documentId === null && !isNewDocument) {
+    throw new Error("Document ID is required for existing documents!");
+  }
   try {
     if (isNewDocument && blocks.length === 0) {
-      if (isStarterDocument) {
-        blocks = starterBlocks;
+      if (templateName !== null) {
+        console.log("Request to create template" , templateName)
+        console.log(templates[templateName]);
+        name = templateName + "_template";
+        blocks = templates[templateName];
       }
       const newDocId = uuidv4();
       await global.db.query(
-        "INSERT INTO documents (id, owner_uid, current_version) VALUES (?, ?, ?)",
+        "INSERT INTO documents (id, owner_uid, current_version, name) VALUES (?, ?, ?, ?)",
         [newDocId, uid, JSON.stringify(blocks), name]
       );
       await global.db.query(
@@ -55,10 +61,10 @@ async function saveDocument(
         console.log("Document updated successfully:", documentId);
         return documentId;
       } else {
-        await global.db.query(
-          "UPDATE documents SET  name = ? WHERE id = ?",
-          [ name, documentId]
-        );
+        await global.db.query("UPDATE documents SET  name = ? WHERE id = ?", [
+          name,
+          documentId,
+        ]);
         console.log("Document name changed successfully", documentId);
         return documentId;
       }
@@ -125,28 +131,33 @@ async function deleteDocument(documentId) {
   const db = global.db; // Use global db instance
 
   try {
-    // Start a transaction to ensure both deletions succeed or fail together
-    await db.query("START TRANSACTION");
-
     // Delete associated document versions
-    const versionsResult = await db.query("DELETE FROM document_versions WHERE document_id = ?", [documentId]);
-    console.log(`Document versions deleted successfully for document ID ${documentId}:`, versionsResult.affectedRows);
+    const versionsResult = await db.query(
+      "DELETE FROM document_versions WHERE document_id = ?",
+      [documentId]
+    );
+    console.log(
+      `Document versions deleted successfully for document ID ${documentId}:`,
+      versionsResult.affectedRows
+    );
 
     // Delete the main document
-    const documentResult = await db.query("DELETE FROM documents WHERE id = ?", [documentId]);
-    console.log(`Document deleted successfully for document ID ${documentId}:`, documentResult.affectedRows);
+    const documentResult = await db.query(
+      "DELETE FROM documents WHERE id = ?",
+      [documentId]
+    );
+    console.log(
+      `Document deleted successfully for document ID ${documentId}:`,
+      documentResult.affectedRows
+    );
 
     // Commit the transaction
     await db.query("COMMIT");
   } catch (err) {
-    // Rollback the transaction in case of an error
-    await db.query("ROLLBACK");
     console.error("Error deleting document:", err);
     throw err;
   }
 }
-
-
 
 module.exports = {
   getDocuments,

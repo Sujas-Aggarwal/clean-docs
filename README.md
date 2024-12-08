@@ -36,6 +36,10 @@ This project is an online rich text editor built with React (Vite), NodeJS and M
 ### Configure the .env files
     Configure the .env files in both client and server based on the .env.example
 
+### Setup the Database
+    Make Sure that MariaDB or MySQL is runnin on your device on PORT 3306 (default port)
+    Now to Migrate, Simply run server/database/migrations/init.js
+
 ### Running the Application
 
 1. Start the server:

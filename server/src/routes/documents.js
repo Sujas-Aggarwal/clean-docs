@@ -51,7 +51,7 @@ router.put("/", async (req, res) => {
       req.body.blocks,
       req.body.isNewDocument,
       req.body.documentId,
-      req.body.isStarterDocument
+      templateName = req.body.templateName
     );
     res.json({ documentId });
   } catch (err) {
