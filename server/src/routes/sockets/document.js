@@ -1,24 +1,27 @@
 const express = require("express");
+const { saveDocument, saveFunctionWS } = require("../../controllers/documentController");
 const router = express.Router();
 
-let activeClients = 0; // Counter to track active WebSocket connections
-
+let activeClients = [];
 router.ws("/:id", (ws, req) => {
-  if (activeClients > 4) {
+  if (activeClients.length >= 4) {
     ws.close(1000, "Server too busy");
     return;
-  }
-  else{
-    activeClients++;
+  } else {
+    activeClients.push(ws);
   }
   console.log("Client connected");
-  console.log(`Now we have ${activeClients} active connections`);
-
-  ws.setMaxListeners(4);
+  console.log(`Now we have ${activeClients.length} active connections`);
 
   // Handle incoming messages
   ws.on("message", (msg) => {
+    saveFunctionWS(uid = req.params.id,blocks = msg);
     console.log("Message from client:", msg);
+    activeClients.forEach((client) => {
+      if (client != ws) {
+        client.send(`${msg}`);
+      }
+    });
   });
 
   // Handle errors
@@ -28,13 +31,10 @@ router.ws("/:id", (ws, req) => {
 
   // Handle disconnections
   ws.on("close", () => {
-    activeClients--; // Decrement on disconnection
+    activeClients = activeClients.filter((client) => client != ws); // Decrement on disconnection
     console.log("Client disconnected");
-    console.log(`Now we have ${activeClients} active connections`);
+    console.log(`Now we have ${activeClients.length} active connections`);
   });
-
-  // Send an initial message to the client
-  ws.send(`Hello! Message from server! You requested for ${req.params.id}`);
 });
 
 module.exports = router;

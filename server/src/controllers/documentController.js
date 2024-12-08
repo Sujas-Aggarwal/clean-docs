@@ -35,7 +35,7 @@ async function saveDocument(
   try {
     if (isNewDocument && blocks.length === 0) {
       if (templateName !== null) {
-        console.log("Request to create template" , templateName)
+        console.log("Request to create template", templateName);
         console.log(templates[templateName]);
         name = templateName + "_template";
         blocks = templates[templateName];
@@ -104,6 +104,18 @@ async function getDocumentVersions(documentId) {
     throw err;
   }
 }
+async function saveFunctionWS(uid, blocks = "[]") {
+  try {
+    await global.db.query(
+      "UPDATE documents SET current_version = ? WHERE id = ?",
+      [blocks, uid]
+    );
+    console.log("Document updated successfully:", uid);
+    return uid;
+  } catch (err) {
+    console.error("Error saving document:", err);
+  }
+}
 
 // Save a new version of a document
 async function saveDocumentVersion(documentId, blocks) {
@@ -166,4 +178,5 @@ module.exports = {
   getDocumentVersions,
   saveDocumentVersion,
   deleteDocument,
+  saveFunctionWS
 };

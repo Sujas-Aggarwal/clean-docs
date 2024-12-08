@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -8,9 +8,10 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const TextEditor = () => {
+  let shouldSave = false;
   const { id } = useParams();
+  const socketRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [editorState, setEditorState] = useState(() =>
@@ -18,11 +19,54 @@ const TextEditor = () => {
   );
   const editorStateRef = useRef(editorState);
   const [docName, setDocName] = useState("Untitled");
+
+  // Establish WebSocket connection
+  const connectWebSocket = useCallback(() => {
+    // Close existing connection if it exists
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+
+    // Create new WebSocket connection
+    const newSocket = new WebSocket(
+      `ws://localhost:8000/socket/document/${id}`
+    );
+
+    newSocket.onopen = () => {
+      console.log("WebSocket Connected");
+    };
+
+    newSocket.onclose = (event) => {
+      console.log("WebSocket Disconnected", event);
+      // Attempt to reconnect after a delay
+      setTimeout(connectWebSocket, 3000);
+    };
+
+    newSocket.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+    };
+
+    socketRef.current = newSocket;
+  }, [id]);
+
   // Update ref whenever editorState changes
   useEffect(() => {
     editorStateRef.current = editorState;
-    //auto focus on editor
   }, [editorState]);
+
+  // Connect WebSocket on component mount or id change
+  useEffect(() => {
+    if (id) {
+      connectWebSocket();
+    }
+
+    // Cleanup function
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
+    };
+  }, [id, connectWebSocket]);
 
   // Document fetching effect
   useEffect(() => {
@@ -33,6 +77,7 @@ const TextEditor = () => {
         });
         const currentVersion = response.data.current_version || [];
         setDocName(response.data.name);
+
         // Convert fetched blocks to EditorState
         const contentState = convertFromRaw({
           entityMap: {},
@@ -73,7 +118,6 @@ const TextEditor = () => {
   useEffect(() => {
     const saveDocOnKeyPress = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        // Use the ref to get the most current editor state
         e.preventDefault();
         saveDocument();
       }
@@ -86,31 +130,14 @@ const TextEditor = () => {
   const saveDocument = async () => {
     setIsSaving(true);
     try {
-      // Derive blocks from the current editorState
       let currentState = editorStateRef.current;
       const rawContent = convertToRaw(currentState.getCurrentContent());
       const currentBlocks = rawContent.blocks;
-      console.log(currentBlocks)
-
-      // Ensure we don't send empty blocks if there were previous blocks
-      const blocksToSave =
-        currentBlocks.length > 0
-          ? currentBlocks
-          : [
-              {
-                text: "",
-                type: "unstyled",
-                depth: 0,
-                inlineStyleRanges: [],
-                entityRanges: [],
-                data: {},
-              },
-            ];
 
       const response = await axios.put(
         "/documents",
         {
-          blocks: blocksToSave,
+          blocks: currentBlocks.length > 0 ? currentBlocks : [],
           isNewDocument: false,
           documentId: id,
           isStarterDocument: false,
@@ -119,43 +146,51 @@ const TextEditor = () => {
       );
 
       console.log("Document Saved Successfully:", response.data);
+      toast.success("Document saved");
     } catch (error) {
       console.error("Error saving document:", error);
       toast.error("Failed to save document");
-    }
-    finally{
+    } finally {
       setIsSaving(false);
     }
-
   };
-  const saveTimeoutRef = useRef(null);
 
   const onEditorStateChange = (newEditorState) => {
     setEditorState(newEditorState);
 
-    // Reset the timer if it's already running
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
+    if (!shouldSave) {
+      shouldSave = true;
     }
-
-    // Start a new timeout
-    saveTimeoutRef.current = setTimeout(() => {
-      saveDocument(newEditorState);
-      saveTimeoutRef.current = null; // Clear the timeout after saving
-    }, 500);
+    // Ensure WebSocket is open before sending
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      try {
+        const rawContent = convertToRaw(newEditorState.getCurrentContent());
+        const currentBlocks = rawContent.blocks;
+        socketRef.current.send(JSON.stringify(currentBlocks));
+      } catch (error) {
+        console.error("Error sending WebSocket message:", error);
+      }
+    }
   };
-
-  // Cleanup on component unmount
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    };
-  }, []);
-
-  if (isLoading) {
+  if (socketRef.current === null) {
     return <div>Loading...</div>;
   }
-  async function setDocumentName(name){
+  socketRef.current.onmessage = (event) => {
+    try {
+      const blocks = JSON.parse(event.data);
+      const contentState = convertFromRaw({
+        entityMap: {},
+        blocks: blocks,
+      });
+      const newEditorState = EditorState.createWithContent(contentState);
+      setEditorState(newEditorState);
+      editorStateRef.current = newEditorState;
+    } catch (error) {
+      console.error("Error receiving WebSocket message:", error);
+    }
+  };
+
+  async function setDocumentName(name) {
     try {
       await axios.put(
         "/documents",
@@ -167,16 +202,25 @@ const TextEditor = () => {
         },
         { withCredentials: true }
       );
+      setDocName(name);
     } catch (error) {
-      console.error("Error saving document:", error);
-      toast.error("Failed to save document");
+      console.error("Error saving document name:", error);
+      toast.error("Failed to save document name");
     }
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
-
-      <EditorHeader isSaving={isSaving} saveFunction={saveDocument} documentName={docName} setDocumentName={setDocumentName}/>
+      <EditorHeader
+        isSaving={isSaving}
+        saveFunction={saveDocument}
+        documentName={docName}
+        setDocumentName={setDocumentName}
+      />
       <div className="bg-[#F8F9FA] min-h-screen pb-16 print:p-0 print:m-0 editor-dabba">
         <div className="h-[120px] print:hidden"></div>
         <Editor
