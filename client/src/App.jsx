@@ -10,6 +10,7 @@ import TextEditor from "./pages/Editor";
 import MyDocs from "./pages/MyDocs";
 import MarkdownEditor from "./pages/Editor/markdown";
 import { ToastContainer } from "react-toastify";
+import Documentation from "./pages/Documentation/page";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
       <Routes>
         <Route element={<PersistLogin />}>
           <Route path="/" element={<Home />} />
+          <Route path="/markdown" element={<MarkdownEditor />} />
+          <Route path="/documentation" element={<Documentation />} />
 
           {/* Routes requiring the user to be logged out */}
           <Route element={<RequireNotAuth />}>

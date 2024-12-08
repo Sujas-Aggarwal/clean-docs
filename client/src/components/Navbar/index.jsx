@@ -15,6 +15,10 @@ export const Navbar = () => {
       name: "My Docs",
       link: "/docs",
     },
+    {
+      name: "Documentation",
+      link: "/documentation",
+    }
     // {
     //   name: "Admin",
     //   link: "/admin",

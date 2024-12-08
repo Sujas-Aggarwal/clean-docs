@@ -166,6 +166,7 @@ const TextEditor = () => {
       try {
         const rawContent = convertToRaw(newEditorState.getCurrentContent());
         const currentBlocks = rawContent.blocks;
+        console.log(currentBlocks);
         socketRef.current.send(JSON.stringify(currentBlocks));
       } catch (error) {
         console.error("Error sending WebSocket message:", error);
