@@ -8,6 +8,9 @@ export default function EditorHeader({
   isSaving = false,
 }) {
   const [title, setTitle] = useState(documentName);
+  function printPage() {
+    window.print();
+  }
   return (
     <div className="flex print:hidden z-[1000] flex-col h-[90px] justify-center items-center bg-white w-full fixed top-0 left-0">
       <div className="h-[35px] w-full flex px-4 items-center gap-1 bg-white ">
@@ -58,12 +61,12 @@ export default function EditorHeader({
         <span onClick={() => {}} className="cursor-pointer"></span>
         <div className="flex-grow">
           <div className="flex items-center  text-sm px-4 gap-3 text-gray-600">
-            <p className="option">File</p>
-            <p className="option">Edit</p>
-            <p className="option">View</p>
+            <p className="option cursor-pointer">File</p>
+            <p className="option cursor-pointer">Edit</p>
+            <p className="option cursor-pointer">View</p>
             {/* <p className="option">Insert</p> */}
             {/* <p className="option">Format</p> */}
-            <p className="option">Tools</p>
+            <p onClick={printPage} className="option cursor-pointer">Export</p>
             <button className="ml-auto border rounded-full p-1 px-3 text-center flex justify-center items-center hover:bg-blue-900 hover:text-white transition-all duration-300">
               Share
             </button>

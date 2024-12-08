@@ -57,7 +57,7 @@ function MyDocs() {
     <div>
       <Navbar />
       <div className="h-[80px]"></div>
-      <div className="px-4">
+      <div className="px-8">
         <div className="border-b flex flex-cl gap-4 flex-col pb-10">
           <h1>Templates</h1>
           <div className="flex gap-4">
@@ -89,7 +89,7 @@ function MyDocs() {
             {docs.map((doc, index) => {
               return (
                 <Link to={`/docs/${doc.id}`} key={index} className="z-10">
-                  <div className="border-b-[2px] w-full p-2    flex  items-center   cursor-pointer hover:shadow-md hover:shadow-black/10 transition-all duration-200">
+                  <div className="border-b-[2px]  w-full p-2    flex  items-center   cursor-pointer hover:shadow-md hover:shadow-black/10 transition-all duration-200">
                     <img
                       src="https://images.freeimages.com/fic/images/icons/2813/flat_jewels/512/file.png"
                       className="w-[60px] h-[60px]"
