@@ -54,7 +54,7 @@ This project is an online rich text editor built with React (Vite), NodeJS and M
     npm start
     ```
 
-3. Open your browser and navigate to `http://localhost:1234`.
+3. Open your browser and navigate to `http://localhost:3000`.
 
 ## Project Structure
 
