@@ -8,6 +8,7 @@ import { Register } from "./pages/LoginSystem/register";
 import { Login } from "./pages/LoginSystem/login";
 import TextEditor from "./pages/Editor";
 import MyDocs from "./pages/MyDocs";
+import MarkdownEditor from "./pages/Editor/markdown";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
           {/* Routes requiring the user to be logged in */}
           <Route element={<RequireAuth allowedRoles={["user"]} />}>
             <Route path="/docs" element={<MyDocs />} />
-            <Route path="/docs/:id" element={<TextEditor />} />
+            <Route path="/docs/:id" element={< MarkdownEditor/>} />
           </Route>
 
           {/* Routes requiring the user to be an admin */}

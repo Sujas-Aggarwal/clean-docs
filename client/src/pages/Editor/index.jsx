@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const TextEditor = () => {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
