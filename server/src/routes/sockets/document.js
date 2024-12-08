@@ -4,7 +4,7 @@ const router = express.Router();
 
 let activeClients = [];
 router.ws("/:id", (ws, req) => {
-  if (activeClients.length >= 4) {
+  if (activeClients.length >= 10) {
     ws.close(1000, "Server too busy");
     return;
   } else {

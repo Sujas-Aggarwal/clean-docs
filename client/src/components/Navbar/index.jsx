@@ -27,7 +27,7 @@ export const Navbar = () => {
   };
 
   return (
-    <header className="bg-[#24063f] fixed top-0 left-0 text-white shadow-md  w-full z-50">
+    <header className=" fixed top-0 left-0 text-gray-400   w-full z-50 ">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Hamburger Icon for Mobile */}
         <div className="flex items-center space-x-3">
@@ -59,7 +59,7 @@ export const Navbar = () => {
               key={index}
               to={menu.link}
               onClick={menuToggle}
-              className="text-white hover:text-purple-500 lg:px-2"
+              className=" hover:text-purple-500 lg:px-2"
             >
               {menu.name}
             </Link>
