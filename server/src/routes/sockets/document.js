@@ -1,5 +1,8 @@
 const express = require("express");
-const { saveDocument, saveFunctionWS } = require("../../controllers/documentController");
+const {
+  saveDocument,
+  saveFunctionWS,
+} = require("../../controllers/documentController");
 const router = express.Router();
 
 let activeClients = [];
@@ -8,18 +11,18 @@ router.ws("/:id", (ws, req) => {
     ws.close(1000, "Server too busy");
     return;
   } else {
-    activeClients.push(ws);
+    activeClients.push({ socket: ws, id: req.params.id });
   }
   console.log("Client connected");
   console.log(`Now we have ${activeClients.length} active connections`);
 
   // Handle incoming messages
   ws.on("message", (msg) => {
-    saveFunctionWS(uid = req.params.id,blocks = msg);
+    saveFunctionWS((uid = req.params.id), (blocks = msg));
     console.log("Message from client:", msg);
-    activeClients.forEach((client) => {
-      if (client != ws) {
-        client.send(`${msg}`);
+    activeClients.filter((client)=>client.id==req.params.id).forEach((client) => {
+      if (client.socket != ws) {
+        client.socket.send(`${msg}`);
       }
     });
   });
@@ -31,7 +34,7 @@ router.ws("/:id", (ws, req) => {
 
   // Handle disconnections
   ws.on("close", () => {
-    activeClients = activeClients.filter((client) => client != ws); // Decrement on disconnection
+    activeClients = activeClients.filter((client) => client.socket != ws); // Decrement on disconnection
     console.log("Client disconnected");
     console.log(`Now we have ${activeClients.length} active connections`);
   });
